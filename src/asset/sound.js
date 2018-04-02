@@ -57,11 +57,13 @@ phina.namespace(function() {
       return this;
     },
 
-    stop: function() {
+    stop: function(when) {
+      when = when ? when + this.context.currentTime : 0;
+
       // stop
       if (this.source) {
         // stop すると source.endedも発火する
-        this.source.stop && this.source.stop(0);
+        this.source.stop && this.source.stop(when);
         this.source = null;
         this.flare('stop');
       }
