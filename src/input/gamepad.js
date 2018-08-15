@@ -373,7 +373,7 @@ phina.namespace(function() {
       } else {
         var t = phina.input.Gamepad.ANALOGUE_BUTTON_THRESHOLD;
         if (Math.abs(value) <= t) {
-          his.sticks[stickId][axisName] = 0;
+          this.sticks[stickId][axisName] = 0;
         } else {
           var v = (Math.abs(value) - t) / (1 - t);
           var sign = value / Math.abs(value);
