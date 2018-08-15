@@ -36,7 +36,7 @@ phina.namespace(function() {
       else {
         var tempKey = '__' + key;
         this[tempKey] = defaultValue;
-        this.accessor(key, {
+        this.$accessor(key, {
           get: function() {
             return this[tempKey];
           },

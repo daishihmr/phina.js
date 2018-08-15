@@ -19,7 +19,7 @@
    *     arr = [6, 5, 2, 3, 1, 4];
    *     arr.first; // => 6
    */
-  Array.prototype.accessor("first", {
+  Array.prototype.$accessor("first", {
       "get": function()   { return this[0]; },
       "set": function(v)  { this[0] = v; }
   });
@@ -32,7 +32,7 @@
    *     arr = [6, 5, 2, 3, 1, 4];
    *     arr.last; // => 4
    */
-  Array.prototype.accessor("last", {
+  Array.prototype.$accessor("last", {
     "get": function()   { return this[this.length-1]; },
     "set": function(v)  { this[this.length-1] = v; }
   });

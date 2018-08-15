@@ -106,7 +106,7 @@ phina.namespace(function() {
 
   });
 
-  phina.app.Element.prototype.getter('flickable', function() {
+  phina.app.Element.prototype.$getter('flickable', function() {
     if (!this._flickable) {
       this._flickable = phina.accessory.Flickable().attachTo(this);
     }

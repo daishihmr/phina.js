@@ -37,7 +37,7 @@
    * @method    pointX
    * マウスのX座標.
    */
-  MouseEvent.prototype.getter("pointX", function() {
+  MouseEvent.prototype.$getter("pointX", function() {
     return this.clientX - this.target.getBoundingClientRect().left;
     // return this.pageX - this.target.getBoundingClientRect().left - window.scrollX;
   });
@@ -46,7 +46,7 @@
    * @method    pointY
    * マウスのY座標.
    */
-  MouseEvent.prototype.getter("pointY", function() {
+  MouseEvent.prototype.$getter("pointY", function() {
     return this.clientY - this.target.getBoundingClientRect().top;
     // return this.pageY - this.target.getBoundingClientRect().top - window.scrollY;
   });
@@ -68,7 +68,7 @@
    * @method    pointX
    * タッチイベント.
    */
-  TouchEvent.prototype.getter("pointX", function() {
+  TouchEvent.prototype.$getter("pointX", function() {
       return this.touches[0].clientX - this.target.getBoundingClientRect().left;
       // return this.touches[0].pageX - this.target.getBoundingClientRect().left - tm.global.scrollX;
   });
@@ -77,7 +77,7 @@
    * @method    pointY
    * タッチイベント.
    */
-  TouchEvent.prototype.getter("pointY", function() {
+  TouchEvent.prototype.$getter("pointY", function() {
       return this.touches[0].clientY - this.target.getBoundingClientRect().top;
       // return this.touches[0].pageY - this.target.getBoundingClientRect().top - tm.global.scrollY;
   });  
@@ -98,7 +98,7 @@
    * @method    pointX
    * タッチイベント.
    */
-  Touch.prototype.getter("pointX", function() {
+  Touch.prototype.$getter("pointX", function() {
       return this.clientX - this.target.getBoundingClientRect().left;
   });
 
@@ -106,7 +106,7 @@
    * @method    pointY
    * タッチイベント.
    */
-  Touch.prototype.getter("pointY", function() {
+  Touch.prototype.$getter("pointY", function() {
       return this.clientY - this.target.getBoundingClientRect().top;
   });
     

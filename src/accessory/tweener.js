@@ -516,7 +516,7 @@ phina.namespace(function() {
    * @property tweener
    * 自身にアタッチ済みの{@link phina.accessory.Tweener}オブジェクト。
    */
-  phina.app.Element.prototype.getter('tweener', function() {
+  phina.app.Element.prototype.$getter('tweener', function() {
     if (!this._tweener) {
       this._tweener = phina.accessory.Tweener().attachTo(this);
     }

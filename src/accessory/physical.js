@@ -62,7 +62,7 @@ phina.namespace(function() {
     },
   });
 
-  phina.app.Element.prototype.getter('physical', function() {
+  phina.app.Element.prototype.$getter('physical', function() {
     if (!this._physical) {
       this._physical = phina.accessory.Physical().attachTo(this);
     }

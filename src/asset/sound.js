@@ -262,7 +262,7 @@ phina.namespace(function() {
     },
 
     _defined: function() {
-      this.accessor('volume', {
+      this.$accessor('volume', {
         get: function() {
           return this.getMasterGain().gain.value;
         },

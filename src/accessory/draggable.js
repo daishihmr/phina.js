@@ -93,7 +93,7 @@ phina.namespace(function() {
 
   });
 
-  phina.app.Element.prototype.getter('draggable', function() {
+  phina.app.Element.prototype.$getter('draggable', function() {
     if (!this._draggable) {
       this._draggable = phina.accessory.Draggable().attachTo(this);
     }

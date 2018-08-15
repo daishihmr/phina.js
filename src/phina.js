@@ -45,7 +45,7 @@ var phina = phina || {};
    * @method global
    * global
    */
-  phina.accessor('global', {
+  phina.$accessor('global', {
     get: function() {
       return ns;
     },
@@ -197,7 +197,7 @@ phina.namespace(function() {
     // accessor
     if (params._accessor) {
       params._accessor.forIn(function(key, value) {
-        _class.prototype.accessor(key, value);
+        _class.prototype.$accessor(key, value);
       });
       // _class.prototype = Object.create(_class.prototype, params._accessor);
     }
@@ -288,7 +288,7 @@ phina.namespace(function() {
     }
 
     var _class = phina.createClass(params);
-    _class.prototype.accessor('className', {
+    _class.prototype.$accessor('className', {
       get: function() {
         return path;
       },

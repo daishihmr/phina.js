@@ -48,7 +48,7 @@
    * @method setter
    * セッターを定義する
    */
-  Object.prototype.$method("setter", function(name, fn){
+  Object.prototype.$method("$setter", function(name, fn){
     Object.defineProperty(this, name, {
       set: fn,
       enumerable: false,
@@ -60,7 +60,7 @@
    * @method getter
    * ゲッターを定義する
    */
-  Object.prototype.$method("getter", function(name, fn){
+  Object.prototype.$method("$getter", function(name, fn){
     Object.defineProperty(this, name, {
       get: fn,
       enumerable: false,
@@ -72,7 +72,7 @@
    * @method accessor
    * アクセッサ(セッター/ゲッター)を定義する
    */
-  Object.prototype.$method("accessor", function(name, param) {
+  Object.prototype.$method("$accessor", function(name, param) {
     Object.defineProperty(this, name, {
       set: param["set"],
       get: param["get"],
@@ -235,7 +235,7 @@
 
         this[tempKey] = tempValue;
 
-        this.accessor(key, {
+        this.$accessor(key, {
           get: function() {
             return this[tempKey];
           },
@@ -248,7 +248,7 @@
       }
       // アクセサディスクリプタの場合
       else {
-        this.accessor(key, {
+        this.$accessor(key, {
           get: function() {
             return descriptor.get.call(this);
           },
@@ -263,7 +263,7 @@
     else {
       var accesskey = '__' + key;
 
-      this.accessor(key, {
+      this.$accessor(key, {
         get: function() {
           return this[accesskey];
         },
@@ -284,7 +284,7 @@
         var tempValue = obj[key];
         obj[tempKey] = tempValue;
         
-        obj.accessor(key, {
+        obj.$accessor(key, {
           get: function() {
             return this[tempKey];
           },
