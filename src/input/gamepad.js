@@ -367,7 +367,18 @@ phina.namespace(function() {
       if (this.sticks[stickId] === undefined) {
         this.sticks[stickId] = phina.geom.Vector2(0, 0);
       }
-      this.sticks[stickId][axisName] = value;
+      if (value == 0) {
+        this.sticks[stickId][axisName] = value;
+      } else {
+        var t = phina.input.Gamepad.ANALOGUE_BUTTON_THRESHOLD;
+        if (Math.abs(value) <= t) {
+          his.sticks[stickId][axisName] = 0;
+        } else {
+          var v = (Math.abs(value) - t) / (1 - t);
+          var sign = value / Math.abs(value);
+          this.sticks[stickId][axisName] = v * sign;
+        }
+      }
     },
 
     _static: {
@@ -381,6 +392,9 @@ phina.namespace(function() {
 
       /** アナログ入力対応のボタンの場合、どの程度まで押し込むとonになるかを表すしきい値. */
       ANALOGUE_BUTTON_THRESHOLD: 0.5,
+
+      /** アナログスティック、どの程度まで倒すとonになるかを表すしきい値. */
+      ANALOGUE_STICK_THRESHOLD: 0.2,
 
       /** ボタン名とボタンIDのマップ. */
       BUTTON_CODE: {
