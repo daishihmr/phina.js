@@ -317,7 +317,7 @@ phina.namespace(function() {
       for (var j = 0, jend = gamepad.axes.length; j < jend; j += 2) {
         this._updateStick(gamepad.axes[j + 0], j / 2, 'x');
         this._updateStick(gamepad.axes[j + 1], j / 2, 'y');
-        this.sticks[j / 2].normalize();
+        this.sticks[j / 2];
       }
     },
 
