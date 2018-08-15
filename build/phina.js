@@ -59,7 +59,7 @@
    * @method setter
    * セッターを定義する
    */
-  Object.prototype.$method("setter", function(name, fn){
+  Object.prototype.$method("$setter", function(name, fn){
     Object.defineProperty(this, name, {
       set: fn,
       enumerable: false,
@@ -71,7 +71,7 @@
    * @method getter
    * ゲッターを定義する
    */
-  Object.prototype.$method("getter", function(name, fn){
+  Object.prototype.$method("$getter", function(name, fn){
     Object.defineProperty(this, name, {
       get: fn,
       enumerable: false,
@@ -83,7 +83,7 @@
    * @method accessor
    * アクセッサ(セッター/ゲッター)を定義する
    */
-  Object.prototype.$method("accessor", function(name, param) {
+  Object.prototype.$method("$accessor", function(name, param) {
     Object.defineProperty(this, name, {
       set: param["set"],
       get: param["get"],
@@ -246,7 +246,7 @@
 
         this[tempKey] = tempValue;
 
-        this.accessor(key, {
+        this.$accessor(key, {
           get: function() {
             return this[tempKey];
           },
@@ -259,7 +259,7 @@
       }
       // アクセサディスクリプタの場合
       else {
-        this.accessor(key, {
+        this.$accessor(key, {
           get: function() {
             return descriptor.get.call(this);
           },
@@ -274,7 +274,7 @@
     else {
       var accesskey = '__' + key;
 
-      this.accessor(key, {
+      this.$accessor(key, {
         get: function() {
           return this[accesskey];
         },
@@ -295,7 +295,7 @@
         var tempValue = obj[key];
         obj[tempKey] = tempValue;
         
-        obj.accessor(key, {
+        obj.$accessor(key, {
           get: function() {
             return this[tempKey];
           },
@@ -1231,7 +1231,7 @@
    *     arr = [6, 5, 2, 3, 1, 4];
    *     arr.first; // => 6
    */
-  Array.prototype.accessor("first", {
+  Array.prototype.$accessor("first", {
       "get": function()   { return this[0]; },
       "set": function(v)  { this[0] = v; }
   });
@@ -1244,7 +1244,7 @@
    *     arr = [6, 5, 2, 3, 1, 4];
    *     arr.last; // => 4
    */
-  Array.prototype.accessor("last", {
+  Array.prototype.$accessor("last", {
     "get": function()   { return this[this.length-1]; },
     "set": function(v)  { this[this.length-1] = v; }
   });
@@ -2348,7 +2348,7 @@ var phina = phina || {};
    * @method global
    * global
    */
-  phina.accessor('global', {
+  phina.$accessor('global', {
     get: function() {
       return ns;
     },
@@ -2500,7 +2500,7 @@ phina.namespace(function() {
     // accessor
     if (params._accessor) {
       params._accessor.forIn(function(key, value) {
-        _class.prototype.accessor(key, value);
+        _class.prototype.$accessor(key, value);
       });
       // _class.prototype = Object.create(_class.prototype, params._accessor);
     }
@@ -2591,7 +2591,7 @@ phina.namespace(function() {
     }
 
     var _class = phina.createClass(params);
-    _class.prototype.accessor('className', {
+    _class.prototype.$accessor('className', {
       get: function() {
         return path;
       },
@@ -5470,7 +5470,7 @@ phina.namespace(function() {
       else {
         var tempKey = '__' + key;
         this[tempKey] = defaultValue;
-        this.accessor(key, {
+        this.$accessor(key, {
           get: function() {
             return this[tempKey];
           },
@@ -6927,7 +6927,7 @@ phina.namespace(function() {
     },
 
     _defined: function() {
-      this.accessor('volume', {
+      this.$accessor('volume', {
         get: function() {
           return this.getMasterGain().gain.value;
         },
@@ -8633,7 +8633,7 @@ phina.namespace(function() {
      */
     getStickDirection: function(stickId) {
       stickId = stickId || 0;
-      return this.sticks ? this.sticks[stickId].clone() : phina.geom.Vector2(0, 0);
+      return this.sticks ? this.sticks[stickId] : phina.geom.Vector2(0, 0);
     },
 
     /**
@@ -8652,6 +8652,7 @@ phina.namespace(function() {
       for (var j = 0, jend = gamepad.axes.length; j < jend; j += 2) {
         this._updateStick(gamepad.axes[j + 0], j / 2, 'x');
         this._updateStick(gamepad.axes[j + 1], j / 2, 'y');
+        this.sticks[j / 2].normalize();
       }
     },
 
@@ -8702,7 +8703,18 @@ phina.namespace(function() {
       if (this.sticks[stickId] === undefined) {
         this.sticks[stickId] = phina.geom.Vector2(0, 0);
       }
-      this.sticks[stickId][axisName] = value;
+      if (value == 0) {
+        this.sticks[stickId][axisName] = value;
+      } else {
+        var t = phina.input.Gamepad.ANALOGUE_BUTTON_THRESHOLD;
+        if (Math.abs(value) <= t) {
+          his.sticks[stickId][axisName] = 0;
+        } else {
+          var v = (Math.abs(value) - t) / (1 - t);
+          var sign = value / Math.abs(value);
+          this.sticks[stickId][axisName] = v * sign;
+        }
+      }
     },
 
     _static: {
@@ -8716,6 +8728,9 @@ phina.namespace(function() {
 
       /** アナログ入力対応のボタンの場合、どの程度まで押し込むとonになるかを表すしきい値. */
       ANALOGUE_BUTTON_THRESHOLD: 0.5,
+
+      /** アナログスティック、どの程度まで倒すとonになるかを表すしきい値. */
+      ANALOGUE_STICK_THRESHOLD: 0.2,
 
       /** ボタン名とボタンIDのマップ. */
       BUTTON_CODE: {
@@ -10686,7 +10701,7 @@ phina.namespace(function() {
    * @property tweener
    * 自身にアタッチ済みの{@link phina.accessory.Tweener}オブジェクト。
    */
-  phina.app.Element.prototype.getter('tweener', function() {
+  phina.app.Element.prototype.$getter('tweener', function() {
     if (!this._tweener) {
       this._tweener = phina.accessory.Tweener().attachTo(this);
     }
@@ -10789,7 +10804,7 @@ phina.namespace(function() {
 
   });
 
-  phina.app.Element.prototype.getter('draggable', function() {
+  phina.app.Element.prototype.$getter('draggable', function() {
     if (!this._draggable) {
       this._draggable = phina.accessory.Draggable().attachTo(this);
     }
@@ -10905,7 +10920,7 @@ phina.namespace(function() {
 
   });
 
-  phina.app.Element.prototype.getter('flickable', function() {
+  phina.app.Element.prototype.$getter('flickable', function() {
     if (!this._flickable) {
       this._flickable = phina.accessory.Flickable().attachTo(this);
     }
@@ -11078,7 +11093,7 @@ phina.namespace(function() {
     },
   });
 
-  phina.app.Element.prototype.getter('physical', function() {
+  phina.app.Element.prototype.$getter('physical', function() {
     if (!this._physical) {
       this._physical = phina.accessory.Physical().attachTo(this);
     }
@@ -11127,7 +11142,7 @@ phina.namespace(function() {
    * @method    pointX
    * マウスのX座標.
    */
-  MouseEvent.prototype.getter("pointX", function() {
+  MouseEvent.prototype.$getter("pointX", function() {
     return this.clientX - this.target.getBoundingClientRect().left;
     // return this.pageX - this.target.getBoundingClientRect().left - window.scrollX;
   });
@@ -11136,7 +11151,7 @@ phina.namespace(function() {
    * @method    pointY
    * マウスのY座標.
    */
-  MouseEvent.prototype.getter("pointY", function() {
+  MouseEvent.prototype.$getter("pointY", function() {
     return this.clientY - this.target.getBoundingClientRect().top;
     // return this.pageY - this.target.getBoundingClientRect().top - window.scrollY;
   });
@@ -11158,7 +11173,7 @@ phina.namespace(function() {
    * @method    pointX
    * タッチイベント.
    */
-  TouchEvent.prototype.getter("pointX", function() {
+  TouchEvent.prototype.$getter("pointX", function() {
       return this.touches[0].clientX - this.target.getBoundingClientRect().left;
       // return this.touches[0].pageX - this.target.getBoundingClientRect().left - tm.global.scrollX;
   });
@@ -11167,7 +11182,7 @@ phina.namespace(function() {
    * @method    pointY
    * タッチイベント.
    */
-  TouchEvent.prototype.getter("pointY", function() {
+  TouchEvent.prototype.$getter("pointY", function() {
       return this.touches[0].clientY - this.target.getBoundingClientRect().top;
       // return this.touches[0].pageY - this.target.getBoundingClientRect().top - tm.global.scrollY;
   });  
@@ -11188,7 +11203,7 @@ phina.namespace(function() {
    * @method    pointX
    * タッチイベント.
    */
-  Touch.prototype.getter("pointX", function() {
+  Touch.prototype.$getter("pointX", function() {
       return this.clientX - this.target.getBoundingClientRect().left;
   });
 
@@ -11196,7 +11211,7 @@ phina.namespace(function() {
    * @method    pointY
    * タッチイベント.
    */
-  Touch.prototype.getter("pointY", function() {
+  Touch.prototype.$getter("pointY", function() {
       return this.clientY - this.target.getBoundingClientRect().top;
   });
     
@@ -14859,32 +14874,98 @@ phina.namespace(function() {
 
 });
 
-
 phina.namespace(function() {
 
   /**
    * @class phina.social.Twitter
-   * 
+   * # Twitter の共有リンクを生成するクラス
+   * Twitter の共有リンクの URL を生成してくれるクラスです。
    */
   phina.define('phina.social.Twitter', {
     /**
      * @constructor
+     * 
+     * コンストラクタは存在しますがインスタンスメンバはありません。
      */
     init: function() {
     },
 
     _static: {
+      /**
+       * @property {String} [phina.social.Twitter.baseURL = 'https://twitter.com/intent']
+       * Twitter の共有リンクのベースとなる URL です。
+       * 
+       * @static
+       */
       baseURL: 'https://twitter.com/intent',
+
+      /**
+       * @property {Object} phina.social.Twitter.defaults
+       * デフォルト値を格納しているオブジェクトです。{@link #phina.social.Twitter.defaults.text}, {@link #phina.social.Twitter.defaults.hashtags}, {@link #phina.social.Twitter.defaults.url} を内包しています。
+       * 
+       * @static
+       */
       defaults: {
         // type: 'tweet',
+        /**
+         * @property {String} [phina.social.Twitter.defaults.text = 'Hello, World']
+         * デフォルトでツイートに含まれる文字列です。
+         * 
+         * @static
+         */
         text: 'Hello, world!',
+
         // screen_name: 'phi_jp',
-        hashtags: 'javascript,phina',
+
+        /**
+         * @property {String} [phina.social.Twitter.defaults.hashtags = 'javascript, phina_js']
+         * デフォルトでツイートに含まれるハッシュタグです。
+         * 
+         * @static
+         */
+        hashtags: 'javascript,phina_js',
+
         // url: 'http://github.com/phi-jp/phina.js',
-        url: phina.global.location && phina.global.location.href,
+
+        /**
+         * @property {String} [phina.social.Twitter.defaults.url = phina.global.location && phina.global.location.href]
+         * デフォルトでツイートに含まれる URL です。
+         * 
+         * @static
+         */
+        url: phina.global.location && phina.global.location.href
+
         // via: 'phi_jp',
       },
 
+      /**
+       * @method phina.social.Twitter.createURL
+       * Twitterの共有リンクを生成します。引数にオブジェクトを渡すことで様々なパラメーターを設定出来ます。引数のオブジェクトは {@link #phina.social.Twitter.defaults} で安全拡張されます。
+       * 
+       * ### Example
+       *     phina.social.Twitter.createURL(); // => http://twitter.com/intent/tweet?text=Hello%2C%20world!&hashtags=javascript%2Cphina&url={現在のURL}
+       * 
+       *     phina.social.Twitter.createURL({
+       *       text: 'This is text',
+       *       hashtags: 'hashtag1,hashtag2',
+       *       url: 'http://phinajs.com'
+       *     }); // => http://twitter.com/intent/tweet?text=This%20is%20text&hashtags=hashtag1%2Chashtag2&url=http%3A%2F%2Fphinajs.com
+       * 
+       *     phina.social.Twitter.createURL({
+       *       text: 'This is text',
+       *       hashtags: 'hashtag1,hashtag2',
+       *       url: 'http://phinajs.com',
+       *       other: 'This is other'//設定項目は適当に増やせる
+       *     }); // => http://twitter.com/intent/tweet?text=This%20is%20text&hashtags=hashtag1%2Chashtag2&url=http%3A%2F%2Fphinajs.com&other=This%20is%20other
+       * 
+       *     phina.social.Twitter.createURL({
+       *       url: 'http://phinajs.com'
+       *     }); // => http://twitter.com/intent/tweet?url=http%3A%2F%2Fphinajs.com&text=Hello%2C%20world!&hashtags=javascript%2Cphina
+       * 
+       * @param {Object}
+       * @return {String} Twitter の共有リンク
+       * @static
+       */
       createURL: function(options) {
         options = (options || {}).$safe(this.defaults);
 
@@ -14903,10 +14984,9 @@ phina.namespace(function() {
         });
 
         return url;
-      },
+      }
     }
   });
-
 });
 
 
