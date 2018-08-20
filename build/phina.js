@@ -1400,7 +1400,7 @@
    * @return {Object} 条件にマッチした最初のインデックス、または -1
    */
   Array.prototype.$method("findIndex", function(fn, self) {
-    var target = null;
+    var target = -1;
 
     this.some(function(elm, i) {
       if (fn.call(self, elm, i, this)) {
@@ -8652,7 +8652,7 @@ phina.namespace(function() {
       for (var j = 0, jend = gamepad.axes.length; j < jend; j += 2) {
         this._updateStick(gamepad.axes[j + 0], j / 2, 'x');
         this._updateStick(gamepad.axes[j + 1], j / 2, 'y');
-        this.sticks[j / 2].normalize();
+        this.sticks[j / 2];
       }
     },
 
@@ -8708,7 +8708,7 @@ phina.namespace(function() {
       } else {
         var t = phina.input.Gamepad.ANALOGUE_BUTTON_THRESHOLD;
         if (Math.abs(value) <= t) {
-          his.sticks[stickId][axisName] = 0;
+          this.sticks[stickId][axisName] = 0;
         } else {
           var v = (Math.abs(value) - t) / (1 - t);
           var sign = value / Math.abs(value);
@@ -13615,7 +13615,7 @@ phina.namespace(function() {
     superClass: 'phina.display.Shape',
 
     init: function(options) {
-      options = ({}).$safe(options || {}, Gauge.defaults);
+      options = ({}).$safe(options || {}, phina.ui.Gauge.defaults);
       
       this.superInit(options);
 
@@ -13625,7 +13625,7 @@ phina.namespace(function() {
       this.cornerRadius = options.cornerRadius;
 
       this.visualValue = (options.value !== undefined) ? options.value : options.maxValue;
-      this.animation = true;
+      this.animation = options.animation;
       this.animationTime = 1*1000;
     },
 
@@ -13733,6 +13733,7 @@ phina.namespace(function() {
         maxValue: 100,
         gaugeColor: '#44f',
         cornerRadius: 0,
+        animation: true
       },
     }
   });
